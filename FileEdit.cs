@@ -2,7 +2,6 @@
 {
     public class FileEdit
     {
-        public string result = "";
         public FileEdit() { }
         public string Read(string path)
         {
@@ -14,6 +13,7 @@
             catch (Exception ex) { Console.WriteLine(ex); }
             return null;
         }
+
         public string[] ReadAllLines(string path)
         {
             if (string.IsNullOrEmpty(path)) return null;
@@ -21,7 +21,7 @@
             {
                 return File.ReadAllLines(path);
             }
-            catch { return null; }
+            catch (Exception ex) { Console.WriteLine(ex); return null; }
         }
         public byte[] ReadAllLinesAsByteTab(string path)
         {
@@ -30,7 +30,7 @@
             {
                 return File.ReadAllBytes(path);
             }
-            catch { return null; }
+            catch (Exception ex) { Console.WriteLine(ex); return null; }
         }
 
 
@@ -43,7 +43,7 @@
             {
                 try
                 {
-                    File.AppendAllText(path, textToSave);
+                    File.WriteAllText(path, textToSave);
                     return true;
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
@@ -56,7 +56,7 @@
                     //MessageBox.Show(textToSave);
                     if (File.Exists(path))
                     {
-                        File.WriteAllText(path, textToSave);
+                        File.AppendAllText(path, textToSave);
                         return true;
                     }
                     else return false;
@@ -74,12 +74,8 @@
             {
                 //MessageBox.Show(path);
                 //MessageBox.Show(textToSave);
-                if (File.Exists(path))
-                {
-                    File.WriteAllBytes(path, textToSave);
-                    return true;
-                }
-                else return false;
+                File.WriteAllBytes(path, textToSave);
+                 return true;
             }
             catch (Exception ex) { Console.WriteLine(ex + ""); }
             return false;
@@ -89,9 +85,7 @@
             if (overwrite)
             {
                 if (string.IsNullOrEmpty(path)) return false;
-                if (string.IsNullOrEmpty(textToSave)) return false;
-
-                if (path == null || path == "" || textToSave == null) return false;
+                if (textToSave == null) return false;
                 try
                 {
                     File.WriteAllText(path, "");
@@ -106,7 +100,8 @@
             }
             else
             {
-                if (path == null || path == "" || textToSave == null) return false;
+                if (string.IsNullOrEmpty(path)) return false;
+                if (textToSave == null) return false;
                 try
                 {
                     foreach (string str in textToSave)
@@ -130,7 +125,7 @@
             }
             catch (Exception ex) { Console.Write(ex); }
         }
-        public string ChangPath(string oldPath, string newPath)
+        public string ChangePath(string oldPath, string newPath)
         {
             try
             {
@@ -147,7 +142,7 @@
         {
             if (overwrite)
             {
-                path = LastFreeFileNameExistInFolder(path, name);
+                path = FindAvailableFileName(path, name);
             }
             else
             {
@@ -174,7 +169,7 @@
         public string CreateFolder(string folderPath, string name)
         {
             string path = "";
-            path = LastFreeFolderNameExistInFolder(folderPath, name);
+            path = FindAvailableFileName(folderPath, name);
             try
             {
                 Directory.CreateDirectory(path);
@@ -186,7 +181,7 @@
         {
             return File.Exists(path);
         }
-        public string LastFreeFileNameExistInFolder(string folderPath, string name)
+        public string FindAvailableFileName(string folderPath, string name)
         {
             int i = 0;
             string path = Path.Combine(folderPath, name + i);
@@ -197,7 +192,7 @@
             }
             return path;
         }
-        public string LastFreeFolderNameExistInFolder(string folderPath, string name)
+        public string FindAvailableFolderName(string folderPath, string name)
         {
             int i = 0;
             string path = Path.Combine(folderPath, name + i);
@@ -233,7 +228,7 @@
             catch (Exception ex) { Console.WriteLine(ex + ""); }
             return null;
         }
-        public string[] allFilesAndFolders(string path)
+        public string[] GetAllFilesAndFolders(string path)
         {
             if (!Directory.Exists(path)) return null;
             try
