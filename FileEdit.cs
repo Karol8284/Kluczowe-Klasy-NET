@@ -23,7 +23,7 @@
             }
             catch (Exception ex) { Console.WriteLine(ex); return null; }
         }
-        public byte[] ReadAllLinesAsByteTab(string path)
+        public byte[] ReadAsBytes(string path)
         {
             if (string.IsNullOrEmpty(path)) return null;
             try
@@ -82,10 +82,22 @@
         }
         public bool Write(string path, string[] textToSave, bool overwrite)
         {
+            if (string.IsNullOrEmpty(path)) return false;
+            if (textToSave == null) return false;
             if (overwrite)
             {
-                if (string.IsNullOrEmpty(path)) return false;
-                if (textToSave == null) return false;
+                try
+                {
+                    foreach (string str in textToSave)
+                    {
+                        File.AppendAllText(path, str);
+                    }
+                    return true;
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
+            }
+            else
+            {
                 try
                 {
                     File.WriteAllText(path, "");
@@ -96,22 +108,6 @@
                     return true;
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
-
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(path)) return false;
-                if (textToSave == null) return false;
-                try
-                {
-                    foreach (string str in textToSave)
-                    {
-                        File.WriteAllText(path, str);
-                    }
-                    return true;
-                }
-                catch (Exception ex) { Console.WriteLine(ex); }
-
             }
             return false;
         }
@@ -120,7 +116,7 @@
             try
             {
                 string direction = Directory.GetParent(path).FullName;
-                string newPath = Path.Combine(direction, path);
+                string newPath = Path.Combine(direction, newName);
                 File.Move(path, newPath);
             }
             catch (Exception ex) { Console.Write(ex); }
@@ -150,8 +146,8 @@
             }
             try
             {
-                StreamWriter sw = File.CreateText(path);
-                sw.Close();
+                File.Create(path).Dispose();
+
             }
             catch (Exception ex) { Console.Write(ex); }
             return path;
@@ -160,8 +156,8 @@
         {
             try
             {
-                StreamWriter sw = File.CreateText(path);
-                sw.Close();
+                File.Create(path).Dispose();
+
             }
             catch (Exception ex) { Console.Write(ex); }
             return path;
@@ -203,7 +199,7 @@
             }
             return path;
         }
-        public FileInfo[] ReturnFilesInfoFromPath(string path)
+        public FileInfo[] GetFilesInfoFromPath(string path)
         {
             if (!Directory.Exists(path)) return null;
             try
@@ -216,7 +212,7 @@
             return null;
 
         }
-        public DirectoryInfo[] ReturnFoldersInfoFromPath(string path)
+        public DirectoryInfo[] GetFoldersInfoFromPath(string path)
         {
             if (!Directory.Exists(path)) return null;
             try
