@@ -1,4 +1,7 @@
-﻿namespace Notatnik.Shared.Services
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+
+namespace Notatnik.Shared.Services
 {
     public class FileEdit
     {
@@ -32,8 +35,15 @@
             }
             catch (Exception ex) { Console.WriteLine(ex); return null; }
         }
-
-
+        public string ReadAsJsonObject(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return null;
+            try
+            {
+                return File.ReadAllText(path);
+            }
+            catch (Exception ex) { Console.WriteLine(ex); return null; }
+        }
         public bool Write(string path, string textToSave, bool overwrite)
         {
             if (string.IsNullOrEmpty(path)) return false;
@@ -108,6 +118,35 @@
                     return true;
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
+            }
+            return false;
+        }
+
+        public bool WriteAsJson(string path, JsonObject jsonObject, bool overwrite)
+        {
+            if (string.IsNullOrEmpty(path)) return false;
+            if (!File.Exists(path)) CreateFile(path);
+            if (overwrite)
+            {
+                try
+                {
+                    File.WriteAllText(path, jsonObject+"");
+                    return true;
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
+            }
+            else
+            {
+                try
+                {
+                    if (File.Exists(path))
+                    {
+                        File.AppendAllText(path, jsonObject + "");
+                        return true;
+                    }
+                    else return false;
+                }
+                catch (Exception ex) { Console.WriteLine(ex + ""); }
             }
             return false;
         }
@@ -231,6 +270,16 @@
             {
                 string[] allFilesAndFolders = Directory.GetFileSystemEntries(path);
                 return allFilesAndFolders;
+            }
+            catch (Exception ex) { Console.WriteLine(ex + ""); }
+            return null;
+        }
+        public string[] GetDirectorys(string path)
+        {
+            if (!Directory.Exists(path)) return null;
+            try
+            {
+                return Directory.GetDirectories(path);
             }
             catch (Exception ex) { Console.WriteLine(ex + ""); }
             return null;
